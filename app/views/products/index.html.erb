@@ -1,0 +1,12 @@
+<div class="wrapper wrapper-content animated fadeInRight">
+  <div id="product_search_form">
+    <%= render 'search' %>
+  </div>
+  </br>
+  <% if @products.present? %>
+    <div id="product_list_form">
+      <%= render 'list' %>
+    </div>
+  <% end %>
+</div>
+  

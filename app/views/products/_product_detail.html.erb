@@ -1,0 +1,30 @@
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4 class="modal-title" id="myModalLabel">Product Detail</h4>
+    </div>
+    <div class="modal-body">
+      <% if product_detail.present? %>
+        <label class="col-md-3 control-label">Title:</label>
+        <div class="col-md-9 mb-3">
+          <%= product_detail.title %>
+        </div> 
+        <label class="col-md-3 control-label">Description:</label>
+        <div class="col-md-9 mb-3">
+          <%= product_detail.description %>
+        </div>  
+        <label class="col-md-3 control-label">Country:</label>
+        <div class="col-md-9 mb-3">
+          <%= product_detail.country %>
+        </div>
+        <label class="col-md-3 control-label">Price:</label>
+        <div class="col-md-9 mb-3">
+          <%= number_to_currency(product_detail.price, :unit => "$", precision: 2) %>
+        </div>
+      <% end %>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary btn-outline" data-dismiss="modal">Close</button>
+    </div>
+ </div>
+</div>

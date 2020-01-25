@@ -1,0 +1,51 @@
+<div class="row">
+  <div class="container col-md-12">
+    <div class="card">
+      <div class="card-header cus-font">
+        Product List
+      </div>
+      <span style="color: red; font-size: 12px;">*** images are random so please don't regard to them!</span>
+      <div class="card-body" id="product_card">
+        <% if @products.present? %>
+          <div class="row">
+            <% @products.each_with_index do |product,index| %>
+              <div class="col-md-4">
+                <div class="card border-secondary mb-3 cus-cont-box">
+                  <div class="card-body text-secondary cus-cont-scroll">
+                    <div class="col-md-12 mb-3">
+                      <%= button_to product_path(:id => product.id), method: "get", remote: true do %>
+                        <%= image_tag "product_pics/#{rand(15)}.jpg", class: "product_image" %>
+                      <% end %>
+                    </div>
+                    <label class="col-md-3 control-label">Price:</label>
+                    <div class="col-md-9 mb-3">
+                      <%= number_to_currency(product.price, :unit => "$", precision: 2) %>
+                    </div>
+                    <label class="col-md-3 control-label">Name:</label>
+                    <div class="col-md-9 mb-3">
+                      <%= product.title %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal fade" id="modal-window" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">Loading...</div>
+            <% end %>
+          </div>
+          <div class="paginate_products">
+            <%= paginate @products, :class=>"my_cls" %>
+            <script>
+              var priceCompare = $('#price_compare :selected').val();
+              displayPrice(priceCompare);
+    
+              $('#price_compare').on('change', function() {
+                var priceCompare = this.value;
+                displayPrice(priceCompare);    
+              });
+            </script>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+</br>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ProductSearch</title>
+    <%= csrf_meta_tags %>
+    <%= include_gon(:init => true) %>
+    <%= Gon::Base.render_data({}) %>
+    <%= csp_meta_tag %>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <%= favicon_link_tag asset_path('Spocket_favicon.jpg') %>
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag 'custom' %>
+
+    <!-- Include style per-controller - vendor plugins -->
+    <%= stylesheet_link_tag params[:controller] if ::Rails.application.assets.find_asset("#{params[:controller]}.css") %>
+    <%= stylesheet_link_tag "#{params[:controller]}/#{params[:action]}" if ::Rails.application.assets.find_asset("#{params[:controller]}/#{params[:action]}.css") %>
+
+    <!-- Include javascript per-controller - vendor plugins -->
+    <%= javascript_include_tag "#{params[:controller]}" if ::Rails.application.assets.find_asset("#{params[:controller]}.js") %>
+    <%= javascript_include_tag "#{params[:controller]}/#{params[:action]}" if ::Rails.application.assets.find_asset("#{params[:controller]}/#{params[:action]}.js") %>
+
+  </head>
+
+  <body>
+    <!-- Wrapper-->
+    <div id="wrapper" class="<%= params[:controller] %>.<%= params[:action] %>">
+
+      <!-- Page wraper -->
+      <div id="page-wrapper" class="gray-bg <%= @extra_class %>">
+
+        <!-- Header -->
+          <%= render 'layouts/header' %>
+        <!-- End Header -->
+
+        <!-- Main view  -->
+        <div id="body-content" class="content">
+	  <% if notice %>
+	    <p class="alert alert-success"><%= notice %></p>
+	  <% end %>
+	  <% if alert %>
+	    <p class="alert alert-danger"><%= alert %></p>
+	  <% end %>
+          <%=yield %>
+        </div>
+        <!-- End Main view  -->
+
+        <!-- Footer -->
+        <%= render 'layouts/footer' %>
+        <!-- End Footer -->
+
+      </div>
+      <!-- End page wrapper-->
+
+    </div>
+    <!-- End wrapper-->
+  </body>
+</html>
