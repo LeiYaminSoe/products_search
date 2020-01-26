@@ -39,7 +39,7 @@
             <div class="form-group"> 
               <label for="search_words" class="col-sm-2 control-label">Country</label> 
               <div class="col-md-10 mb-3">
-                <%= f.select :country_cont, options_for_select(Product.distinct.pluck(:country)), {:include_blank => true}, :class=>"form-control cus-form-font" %>
+                <%= f.select :country_cont, options_for_select(Product.distinct.pluck(:country), @q.country_cont), {:include_blank => true}, :class=>"form-control cus-form-font" %>
               </div>
             </div>
           </div>

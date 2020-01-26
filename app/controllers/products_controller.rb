@@ -3,10 +3,7 @@ class ProductsController < ApplicationController
 
   # GET /products
   # GET /products.json
-  def index
-    @q = Product.ransack(params[:q])
-    @q.build_grouping unless @q.groupings.any?
-    
+  def index    
     if params[:price_compare].present?
       price_compare = params[:price_compare]
       case price_compare
@@ -21,6 +18,9 @@ class ProductsController < ApplicationController
         params[:q][:price_eq] = ""
       end
     end
+    
+    @q = Product.ransack(params[:q])
+    @q.build_grouping unless @q.groupings.any?
     
     @all_products = @q.result(distinct: true)
     @products = @q.result(distinct: true).order(updated_at: :desc).paginate(page: params[:page], per_page: 10)
