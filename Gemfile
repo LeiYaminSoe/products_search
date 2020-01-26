@@ -57,7 +57,8 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'ransack'
 
 #pagination
-gem 'kaminari'
+#gem 'kaminari'
+gem 'will_paginate', '~> 3.1.0'
 
 #bootstrap-sass
 gem "bootstrap-sass", ">= 3.4.1"

@@ -3,6 +3,18 @@
     <%= render 'search' %>
   </div>
   </br>
+  <%= simple_form_for :search, url: product_sorting_path, method: "POST", html: { class: 'form-inline', id: 'sort_form' } do |f| %>
+    <div class="row">
+      <div class="col-sm-12 mb-3">
+        <div class="form-group"> 
+          <label for="search_words" class="col-sm-2 control-label">Sort By:</label> 
+          <div class="col-md-10 mb-3">
+            <%= select_tag "sort_by", options_for_select([ "Relevance", "Newest", "Lowest Price", "Highest Price" ], params[:sort_by]), :class=>"form-control cus-form-font" %>
+          </div>
+        </div>
+      </div>
+    </div>  
+  <% end %>
   <% if @products.present? %>
     <div id="product_list_form">
       <%= render 'list' %>

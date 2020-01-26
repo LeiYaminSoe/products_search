@@ -4,6 +4,9 @@ class ProductsController < ApplicationController
   # GET /products
   # GET /products.json
   def index
+    @q = Product.ransack(params[:q])
+    @q.build_grouping unless @q.groupings.any?
+    
     if params[:price_compare].present?
       price_compare = params[:price_compare]
       case price_compare
@@ -18,18 +21,25 @@ class ProductsController < ApplicationController
         params[:q][:price_eq] = ""
       end
     end
-    #debugger
-    #sort_val = "title ILIKE %" + params[:q][:g]["0"][:title_cont] + "%"
-    @q = Product.ransack(params[:q])
-    @q.build_grouping unless @q.groupings.any?
     
-    #@q.sorts = [sort_val] if @q.sorts.empty?
-    #@q.sorts = ['title = "Zeta" asc'] if @q.sorts.empty?
-    #@q.sorts = ['title desc'] if @q.sorts.empty?
-    @products = @q.result(distinct: true).page(params[:page]).per(10)
-    #order("title = 'Rhinestone' asc")
-    gon.products = @products
-    #debugger
+    @all_products = @q.result(distinct: true)
+    @products = @q.result(distinct: true).order(updated_at: :desc).paginate(page: params[:page], per_page: 10)
+    
+    if params[:q].present?
+      if params[:q][:g].present?
+        if params[:q][:g]["0"].present?
+          if params[:q][:g]["0"][:title_cont].present?
+            product_title = "%" + params[:q][:g]["0"][:title_cont] + "%"
+            by_title = Product.send(:sanitize_sql_array, [ 'CASE WHEN title ILIKE ? then 1 else 2 end', product_title ])
+            pro_arr = @q.result.order(by_title).uniq
+            @products = Product.where(id: pro_arr.map{|h| h["id"]}).paginate(page: params[:page], per_page: 10)
+          end
+        end
+      end
+    end
+    
+    gon.products = @all_products
+    
   end
   
   def product_detail
@@ -41,47 +51,30 @@ class ProductsController < ApplicationController
   
   def product_sorting
     if params[:products].present?
-   # debugger
       products = params[:products].permit!.to_hash
-      #products = params[:products].to_hash
-      #params[:products].to_hash.sort_by{|k,v| v["id"]}.reverse
-      
-      #products.sort_by { |k, v| v[:created_at] }
-      
       if products.present?
-        #@products = products.sort_by &:created_at
-        #@products = products.order(:created_at)
         if params[:sortBy].present?
           sort_by = params[:sortBy]
           case sort_by
           when "Highest Price"
-            @ps = products.sort_by{|k,v| v["price"]}.reverse
+            @products = Product.where(id: products.map{|h| h[1]["id"]}).order(price: :desc).paginate(page: params[:page], per_page: 10)
           when "Lowest Price"
-            @ps = products.sort_by{|k,v| v["price"]}
+            @products = Product.where(id: products.map{|h| h[1]["id"]}).order(:price).paginate(page: params[:page], per_page: 10)
           when "Newest"
-            @ps = products.sort_by{|k,v| v["updated_at"]}.reverse
-          else
-            @ps = products.sort_by{|k,v| v["title"]}
+            @products = Product.where(id: products.map{|h| h[1]["id"]}).order(updated_at: :desc).paginate(page: params[:page], per_page: 10)
+          else           
+            if params[:product_title].present?
+              product_title = "%" + params[:product_title] + "%"
+              by_title = Product.send(:sanitize_sql_array, [ 'CASE WHEN title ilike ? then 1 else 2 end', product_title ])
+              @products = Product.where(id: products.map{|h| h[1]["id"]}).order(by_title).paginate(page: params[:page], per_page: 10)
+            end
           end
-          #debugger
-    #@products = Product.where(id: @ps.values.map{|h| puts h["id"]})
-    @products = Product.where(id: @ps.map{|h| h[1]["id"]}).page(params[:page]).per(10)
-    #products.values.map{|h| puts h["id"] }
-    #{ where(id: ARRAY_COLLECTION.map(&:id)) }
-    #Job.where(id: array.map(&:id))
         end        
       end
     end
-    #debugger
-   render json: @products 
-   #render :partial => 'list'
-   # format.js {render layout: false}
-    #render partial: 'list', locals: { :products => @products }
-    #render :partial => 'list', locals: { :products => @products }
-    #render json: { html: render_to_string(partial: 'list', locals: { :products => @products }) }
-    # respond_to do |format|
-      # format.html { render 'products/_list.html.erb'}
-    # end    
+    respond_to do |format|
+      format.js { render 'products/product_sorting.js.erb', :locals => {:products => @products} }
+    end    
   end
 
   # GET /products/1
