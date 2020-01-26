@@ -45,4 +45,13 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to products_url
   end
+  
+  test "should display correct products on title search" do
+    get products_path
+    assert_template "products/index"
+    get products_path, params: { "q[g][0][title_cont]" => "Seahorse" }
+    assert_template "products/index"
+    assert_response :success
+  end
+  
 end
