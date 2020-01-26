@@ -18,31 +18,18 @@ class ProductsController < ApplicationController
         params[:q][:price_eq] = ""
       end
     end
+    #debugger
+    #sort_val = "title ILIKE %" + params[:q][:g]["0"][:title_cont] + "%"
     @q = Product.ransack(params[:q])
+    @q.build_grouping unless @q.groupings.any?
     
-    shared_context = Ransack::Context.for(Product)
-    search_parents = Product.ransack(params[:q], context: shared_context)
-    search_children = Product.ransack(
-      { tags_name_eq:  params[:q][:tags_name_cont]}, context: shared_context
-    )    
-    shared_conditions = [search_parents, search_children].map { |search|
-      Ransack::Visitor.new.accept(search.base)
-    }
-    
-    @products = Product.joins(shared_context.join_sources).where(shared_conditions.reduce(&:or)).result(distinct: true).page(params[:page]).per(10)
-  
-#debugger  
-    
-    
-    
-    
-    # @products = @q.result(distinct: true).page(params[:page]).per(10)
-    
-    # if params[:q].present?
-      # if params[:q][:tags_name_cont].present?
-        # @relevance_products = Product.joins(:tags).where(:tags => {:name => params[:q][:tags_name_cont]})
-      # end
-    # end
+    #@q.sorts = [sort_val] if @q.sorts.empty?
+    #@q.sorts = ['title = "Zeta" asc'] if @q.sorts.empty?
+    #@q.sorts = ['title desc'] if @q.sorts.empty?
+    @products = @q.result(distinct: true).page(params[:page]).per(10)
+    #order("title = 'Rhinestone' asc")
+    gon.products = @products
+    #debugger
   end
   
   def product_detail
@@ -50,6 +37,51 @@ class ProductsController < ApplicationController
       format.html
       format.js
     end
+  end
+  
+  def product_sorting
+    if params[:products].present?
+   # debugger
+      products = params[:products].permit!.to_hash
+      #products = params[:products].to_hash
+      #params[:products].to_hash.sort_by{|k,v| v["id"]}.reverse
+      
+      #products.sort_by { |k, v| v[:created_at] }
+      
+      if products.present?
+        #@products = products.sort_by &:created_at
+        #@products = products.order(:created_at)
+        if params[:sortBy].present?
+          sort_by = params[:sortBy]
+          case sort_by
+          when "Highest Price"
+            @ps = products.sort_by{|k,v| v["price"]}.reverse
+          when "Lowest Price"
+            @ps = products.sort_by{|k,v| v["price"]}
+          when "Newest"
+            @ps = products.sort_by{|k,v| v["updated_at"]}.reverse
+          else
+            @ps = products.sort_by{|k,v| v["title"]}
+          end
+          #debugger
+    #@products = Product.where(id: @ps.values.map{|h| puts h["id"]})
+    @products = Product.where(id: @ps.map{|h| h[1]["id"]}).page(params[:page]).per(10)
+    #products.values.map{|h| puts h["id"] }
+    #{ where(id: ARRAY_COLLECTION.map(&:id)) }
+    #Job.where(id: array.map(&:id))
+        end        
+      end
+    end
+    #debugger
+   render json: @products 
+   #render :partial => 'list'
+   # format.js {render layout: false}
+    #render partial: 'list', locals: { :products => @products }
+    #render :partial => 'list', locals: { :products => @products }
+    #render json: { html: render_to_string(partial: 'list', locals: { :products => @products }) }
+    # respond_to do |format|
+      # format.html { render 'products/_list.html.erb'}
+    # end    
   end
 
   # GET /products/1

@@ -60,7 +60,7 @@ gem 'ransack'
 gem 'kaminari'
 
 #bootstrap-sass
-gem 'bootstrap-sass'
+gem "bootstrap-sass", ">= 3.4.1"
 
 #jquery
 gem 'jquery-rails'
@@ -70,3 +70,6 @@ gem 'jquery-ui-rails'
 gem 'popper_js', '~> 1.14.5'
 
 gem 'gon'
+
+#simple_form_for
+gem 'simple_form'

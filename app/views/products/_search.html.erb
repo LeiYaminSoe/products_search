@@ -8,14 +8,25 @@
     <div class="row">
       <div class="state_search">
         <%= search_form_for @q, :url => products_path, :class=>"form-horizontal" do |f| %>            
-          <div class="col-sm-12">
-            <div class="form-group"> 
-              <label for="search_words" class="col-sm-2 control-label">Title</label> 
-              <div class="col-md-10 mb-3">
-                <%= f.search_field :title_cont, :class=>"form-control cus-form-font", :autocomplete => "off" %>
+          <%= f.grouping_fields do |g| %>
+            <%= g.hidden_field :m, value: 'or' %>
+            <div class="col-sm-12">
+              <div class="form-group"> 
+                <label for="search_words" class="col-sm-2 control-label">Title</label> 
+                <div class="col-md-10 mb-3">
+                  <%= g.search_field :title_cont, :class=>"form-control cus-form-font", :autocomplete => "off" %>
+                </div>
               </div>
             </div>
-          </div>
+            <div class="col-sm-12">
+              <div class="form-group"> 
+                <label for="search_words" class="col-sm-2 control-label">Tags</label> 
+                <div class="col-md-10 mb-3">
+                  <%= g.search_field :tags_name_cont, :class=>"form-control cus-form-font", :autocomplete => "off" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
           <div class="col-sm-12">
             <div class="form-group"> 
               <label for="search_words" class="col-sm-2 control-label">Description</label> 
@@ -23,20 +34,12 @@
                 <%= f.search_field :description_cont, :class=>"form-control cus-form-font", :autocomplete => "off" %>
               </div>
             </div>
-          </div>
-          <div class="col-sm-12">
-            <div class="form-group"> 
-              <label for="search_words" class="col-sm-2 control-label">Tags</label> 
-              <div class="col-md-10 mb-3">
-                <%= f.search_field :tags_name_cont, :class=>"form-control cus-form-font", :autocomplete => "off" %>
-              </div>
-            </div>
-          </div>
+          </div>          
           <div class="col-sm-12">
             <div class="form-group"> 
               <label for="search_words" class="col-sm-2 control-label">Country</label> 
               <div class="col-md-10 mb-3">
-                <%= f.select :country_cont, options_for_select(Product.distinct.pluck(:country)), {}, :class=>"form-control cus-form-font" %>
+                <%= f.select :country_cont, options_for_select(Product.distinct.pluck(:country)), {:include_blank => true}, :class=>"form-control cus-form-font" %>
               </div>
             </div>
           </div>
